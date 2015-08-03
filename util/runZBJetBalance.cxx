@@ -123,7 +123,7 @@ int main( int argc, char* argv[] ) {
          iArg += 2;
        }
     } else if (options.at(iArg).compare("-syst") == 0) {
-       if (iArg+1 == argc || iArg+1 == options.size() || options.at(iArg+1)[0] == '-' || tmpChar == '-' ) {
+       if (iArg+1 == argc || iArg+1 == options.size() || options.at(iArg+1)[0] == '-'  ) {
          std::cout << " -inFile should be followed by a systematic string and an integer" << std::endl;
          return 1;
        } else {
