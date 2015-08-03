@@ -83,8 +83,7 @@ int main( int argc, char* argv[] ) {
        // Ignore if not first argument
        ++iArg;
     } else if (options.at(iArg).compare("-inFile") == 0) {
-       char tmpChar = options.at(iArg+1)[0];
-       if (iArg+1 == argc || tmpChar == '-' ) {
+       if (iArg+1 == argc || iArg+1 == options.size() || options.at(iArg+1)[0] == '-' ) {
          std::cout << " -inFile should be followed by a file or folder" << std::endl;
          return 1;
        } else {
@@ -92,8 +91,7 @@ int main( int argc, char* argv[] ) {
          iArg += 2;
        }
     } else if (options.at(iArg).compare("-inputTag") == 0) {
-       char tmpChar = options.at(iArg+1)[0];
-       if (iArg+1 == argc || tmpChar == '-' ) {
+       if (iArg+1 == argc || iArg+1 == options.size() || options.at(iArg+1)[0] == '-' ) {
          std::cout << " -inputTag is a wildcarded file name to run on" << std::endl;
          return 1;
        } else {
@@ -101,8 +99,7 @@ int main( int argc, char* argv[] ) {
          iArg += 2;
        }
     } else if (options.at(iArg).compare("-outputTag") == 0) {
-       char tmpChar = options.at(iArg+1)[0];
-       if (iArg+1 == argc || tmpChar == '-' ) {
+       if (iArg+1 == argc || iArg+1 == options.size() || options.at(iArg+1)[0] == '-' ) {
          std::cout << " -outputTag should be followed by a job version string" << std::endl;
          return 1;
        } else {
@@ -110,8 +107,7 @@ int main( int argc, char* argv[] ) {
          iArg += 2;
        }
     } else if (options.at(iArg).compare("-submitDir") == 0) {
-       char tmpChar = options.at(iArg+1)[0];
-       if (iArg+1 == argc || tmpChar == '-' ) {
+       if (iArg+1 == argc || iArg+1 == options.size() || options.at(iArg+1)[0] == '-' ) {
          std::cout << " -submitDir should be followed by a folder name" << std::endl;
          return 1;
        } else {
@@ -119,8 +115,7 @@ int main( int argc, char* argv[] ) {
          iArg += 2;
        }
     } else if (options.at(iArg).compare("-configName") == 0) {
-       char tmpChar = options.at(iArg+1)[0];
-       if (iArg+1 == argc || tmpChar == '-' ) {
+       if (iArg+1 == argc || iArg+1 == options.size() || options.at(iArg+1)[0] == '-' ) {
          std::cout << " -configName should be followed by a config file" << std::endl;
          return 1;
        } else {
@@ -128,8 +123,7 @@ int main( int argc, char* argv[] ) {
          iArg += 2;
        }
     } else if (options.at(iArg).compare("-syst") == 0) {
-       char tmpChar = options.at(iArg+1)[0];
-       if (iArg+1 == argc || iArg+2 == argc || tmpChar == '-' ) {
+       if (iArg+1 == argc || iArg+1 == options.size() || options.at(iArg+1)[0] == '-' || tmpChar == '-' ) {
          std::cout << " -inFile should be followed by a systematic string and an integer" << std::endl;
          return 1;
        } else {
