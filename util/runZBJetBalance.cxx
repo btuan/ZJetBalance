@@ -56,7 +56,7 @@ int main( int argc, char* argv[] ) {
   float systVal = 0;
 
   // True -> use Muons; False -> Use Electrons
-  bool useMuons = false;
+  bool useMuons = true;
 
   /////////// Retrieve arguments //////////////////////////
   std::vector< std::string> options;
@@ -288,16 +288,37 @@ int main( int argc, char* argv[] ) {
 
   // Declare all lepton operations first, initialization comes later. Slightly inconsistent with other algos, but saves system resources.
   /// MUONS ///
-  MuonCalibrator* muonCalib;
-  MuonSelector* muonSelect;
-  MuonSelector* muonSelectForMuonInJetCorrection;
-  MuonEfficiencyCorrector* muonCorrect;
+  MuonCalibrator* muonCalib = new MuonCalibrator();
+  muonCalib->setName( "muonCalib" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonCalib.config")->setSyst( systName, systVal );
+
+  MuonSelector* muonPreSelect = new MuonSelector();
+  muonPreSelect->setName( "muonPreSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonPreSelect.config");
+
+  MuonSelector* muonSelect = new MuonSelector();
+  muonSelect->setName( "muonSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonSelect.config");
+
+  MuonSelector* muonSelectForMuonInJetCorrection = new MuonSelector();
+  muonSelectForMuonInJetCorrection->setName( "muonSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonSelectForMuonInJetCorrection.config");
+
+  MuonEfficiencyCorrector* muonCorrect = new MuonEfficiencyCorrector();
+  muonCorrect->setName( "muonCorrect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonCorrect.config");
   
   /// ELECTRONS ///
-  ElectronCalibrator* electronCalib;
-  ElectronSelector* electronSelect;
-  ElectronSelector* electronSelectForElectronInJetCorrection;
-  ElectronEfficiencyCorrector* electronCorrect;
+  ElectronCalibrator* electronCalib = new ElectronCalibrator();
+  electronCalib->setName( "electronCalib" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronCalib.config")->setSyst( systName, systVal );
+
+  ElectronSelector* electronPreSelect = new ElectronSelector();
+  electronPreSelect->setName( "electronPreSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronPreSelect.config");
+
+  ElectronSelector* electronSelect = new ElectronSelector();
+  electronSelect->setName( "electronSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronSelect.config");
+
+  ElectronSelector* electronSelectForElectronInJetCorrection = new ElectronSelector();
+  electronSelectForElectronInJetCorrection->setName( "electronSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronSelectForElectronInJetCorrection.config");
+
+  ElectronEfficiencyCorrector* electronCorrect = new ElectronEfficiencyCorrector();
+  electronCorrect->setName( "electronCorrect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronCorrect.config");
+    
 
   /// JETS ///
   // jet calibrator
@@ -311,62 +332,24 @@ int main( int argc, char* argv[] ) {
   // bjet efficiency corrector
   BJetEfficiencyCorrector* bjetCorrectVeryLoose = new BJetEfficiencyCorrector();
   bjetCorrectVeryLoose->setName( "bjetCorrectVeryLoose" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/bjetCorrectVeryLoose.config" );
+
   BJetEfficiencyCorrector* bjetCorrectLoose = new BJetEfficiencyCorrector();
   bjetCorrectLoose->setName( "bjetCorrectLoose" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/bjetCorrectLoose.config" );
+
   BJetEfficiencyCorrector* bjetCorrectMedium = new BJetEfficiencyCorrector();
   bjetCorrectMedium->setName( "bjetCorrectMedium" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/bjetCorrectMedium.config" );
+
   BJetEfficiencyCorrector* bjetCorrectTight = new BJetEfficiencyCorrector();
   bjetCorrectTight->setName( "bjetCorrectTight" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/bjetCorrectTight.config" );
   
   /// OVERLAP REMOVAL ///
-  OverlapRemover* overlapRemoverElectrons;
-  OverlapRemover* overlapRemoverMuons;
-
+  OverlapRemover* overlapRemover = new OverlapRemover();
+  overlapRemover->setName( "overlapRemover" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/overlapRemoval.config" );
 
   /// BALANCING ALGORITHM ///
-  // Declare both analyses. Again, initialization comes later.
+  // Declare both analyses. Initialization comes later.
   BalanceAlgorithm* balAlg; 
   EEBalanceAlgorithm* eebalAlg;
-
-  // Lepton choice switch. Initialize algorithms depending on which lepton we want to use.
-  if ( useMuons ){ // If useMuons is true, use muons for Z->mumu
-    muonCalib = new MuonCalibrator();
-    muonCalib->setName( "muonCalib" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonCalib.config")->setSyst( systName, systVal );
-
-    muonSelect = new MuonSelector();
-    muonSelect->setName( "muonSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonSelect.config");
-
-    muonSelectForMuonInJetCorrection = new MuonSelector();
-    muonSelectForMuonInJetCorrection->setName( "muonSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonSelectForMuonInJetCorrection.config");
-
-    muonCorrect = new MuonEfficiencyCorrector();
-    muonCorrect->setName( "muonCorrect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/muonCorrect.config");
-    
-    overlapRemoverMuons = new OverlapRemover();
-    overlapRemoverMuons->setName( "overlapRemoverMuons" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/overlapRemovalMuons.config" );
-
-    balAlg = new BalanceAlgorithm();
-    balAlg->setName("ZJetBalanceAlgo")->setConfig( "$ROOTCOREBIN/data/ZJetBalance/zjetAlgo.config" );
-  } else{ // Else, use electros for Z->ee
-    electronCalib = new ElectronCalibrator();
-    electronCalib->setName( "electronCalib" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronCalib.config")->setSyst( systName, systVal );
-
-    electronSelect = new ElectronSelector();
-    electronSelect->setName( "electronSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronSelect.config");
-
-    electronSelectForElectronInJetCorrection = new ElectronSelector();
-    electronSelectForElectronInJetCorrection->setName( "electronSelect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronSelectForElectronInJetCorrection.config");
-
-    electronCorrect = new ElectronEfficiencyCorrector();
-    electronCorrect->setName( "electronCorrect" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/electronCorrect.config");
-    
-    overlapRemoverElectrons = new OverlapRemover();
-    overlapRemoverElectrons->setName( "overlapRemoverElectrons" )->setConfig( "$ROOTCOREBIN/data/ZJetBalance/overlapRemovalElectrons.config" );
-
-    eebalAlg = new EEBalanceAlgorithm();
-    eebalAlg->setName("ZeeJetBalanceAlgo")->setConfig( "$ROOTCOREBIN/data/ZJetBalance/zeejetAlgo.config" );
-  }
-
 
 //  muonCalib->m_debug    = true;
 //  muonSelect->m_debug   = true;
@@ -378,29 +361,33 @@ int main( int argc, char* argv[] ) {
   // ADD ALGOS TO JOB
   job.algsAdd( baseEventSel );
 
-  if( useMuons ){
-    job.algsAdd( muonCalib    );
-    job.algsAdd( muonSelect   );
-    job.algsAdd( muonSelectForMuonInJetCorrection   );
-    //job.algsAdd( muonCorrect  ); // commented out to avoid crash so far
-  } else{
-    job.algsAdd ( electronCalib );
-    job.algsAdd ( electronSelect );
-    job.algsAdd ( electronSelectForElectronInJetCorrection );
-  }
-
+  job.algsAdd( muonCalib    );
+  job.algsAdd( muonPreSelect);
+  job.algsAdd( electronCalib     );
+  job.algsAdd( electronPreSelect );
   job.algsAdd( jetCalib     );
+  job.algsAdd( overlapRemover );
+
   job.algsAdd( jetSelect    );
   job.algsAdd( bjetCorrectVeryLoose  );
   job.algsAdd( bjetCorrectLoose      );
   job.algsAdd( bjetCorrectMedium     );
   job.algsAdd( bjetCorrectTight      );
 
+
   if( useMuons ){
-    job.algsAdd( overlapRemoverMuons );
+    job.algsAdd( muonSelect      );
+    job.algsAdd( muonSelectForMuonInJetCorrection   );
+    job.algsAdd( muonCorrect     ); 
+    balAlg = new BalanceAlgorithm();
+    balAlg->setName("ZJetBalanceAlgo")->setConfig( "$ROOTCOREBIN/data/ZJetBalance/zjetAlgo.config" );
     job.algsAdd( balAlg );
   }else{
-    job.algsAdd( overlapRemoverElectrons );
+    job.algsAdd( electronSelect  );
+    job.algsAdd( electronSelectForElectronInJetCorrection );
+    job.algsAdd( electronCorrect );
+    eebalAlg = new EEBalanceAlgorithm();
+    eebalAlg->setName("ZeeJetBalanceAlgo")->setConfig( "$ROOTCOREBIN/data/ZJetBalance/zeejetAlgo.config" );
     job.algsAdd( eebalAlg );
   }
 
